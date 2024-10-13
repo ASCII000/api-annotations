@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Anotações</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-semibold text-gray-800">Minhas Anotações</h1>
+            <button id="logoutBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                Logout
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for annotation in annotations %}
+            <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 ease-in-out">
+                <div class="p-6">
+                    <h2 class="text-xl font-semibold mb-2 text-gray-800">{{ annotation.title }}</h2>
+                    <p class="text-gray-600 mb-4">{{ annotation.description }}</p>
+                    <a href="{{ annotation.url }}" target="_blank" class="text-blue-500 hover:text-blue-600 transition duration-300 ease-in-out">Ver mais</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-8">
+            <button id="addAnnotationBtn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                Adicionar Anotação
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar anotação -->
+    <div id="addAnnotationModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Adicionar Nova Anotação</h3>
+                <div class="mt-2 px-7 py-3">
+                    <input id="titleInput" type="text" placeholder="Título" class="mb-3 px-3 py-2 border rounded-md w-full">
+                    <textarea id="descriptionInput" placeholder="Descrição" class="mb-3 px-3 py-2 border rounded-md w-full"></textarea>
+                    <input id="urlInput" type="url" placeholder="URL" class="mb-3 px-3 py-2 border rounded-md w-full">
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="saveAnnotationBtn" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica para abrir/fechar o modal e adicionar anotação
+        const addAnnotationBtn = document.getElementById('addAnnotationBtn');
+        const addAnnotationModal = document.getElementById('addAnnotationModal');
+        const saveAnnotationBtn = document.getElementById('saveAnnotationBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+
+        addAnnotationBtn.onclick = function() {
+            addAnnotationModal.classList.remove('hidden');
+        }
+
+        saveAnnotationBtn.onclick = function() {
+            const title = document.getElementById('titleInput').value;
+            const description = document.getElementById('descriptionInput').value;
+            const url = document.getElementById('urlInput').value;
+            
+            // Aqui você pode adicionar a lógica para salvar a anotação
+            console.log('Nova anotação:', { title, description, url });
+            
+            addAnnotationModal.classList.add('hidden');
+            // Limpar os campos do formulário
+            document.getElementById('titleInput').value = '';
+            document.getElementById('descriptionInput').value = '';
+            document.getElementById('urlInput').value = '';
+        }
+
+        // Fechar o modal se clicar fora dele
+        window.onclick = function(event) {
+            if (event.target == addAnnotationModal) {
+                addAnnotationModal.classList.add('hidden');
+            }
+        }
+
+        logoutBtn.onclick = function() {
+            fetch('/logout', { redirect: 'manual' })
+                .then(response => {
+                    if (response.type === 'opaqueredirect') {
+                        window.location.href = '/';
+                    } else {
+                        return response.json();
+                    }
+                })
+                .catch(error => window.alert("Ocorreu um erro ao realizar o logout: " + error));
+        };
+    </script>
+</body>
+</html>
