@@ -15,7 +15,7 @@ import uvicorn
 
 from src.settings import settings
 
-
+# Instancias fastapi jinja templates, e entregar arquivos estaticos
 app = FastAPI()
 templates = Jinja2Templates(directory="src/templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
