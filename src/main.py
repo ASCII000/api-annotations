@@ -44,10 +44,10 @@ async def login(
     password: str = Body(..., embed=True),
 ):
     if password != settings.APP_TOKEN:
-        return templates.TemplateResponse("login.html", {"request": request, "error": "Senha inválida"})
+        return JSONResponse({"error": "Senha inválida"}, status_code=401)
     
-    response = RedirectResponse("/annotations", status_code=302)
-    response.set_cookie("token", settings.APP_TOKEN, expires=86400)
+    response = RedirectResponse(url="/annotations", status_code=302)
+    response.set_cookie(key="token", value=settings.APP_TOKEN, max_age=86400, httponly=True, secure=True, samesite="strict")
     return response
 
 @app.get("/logout")
