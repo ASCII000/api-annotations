@@ -31,6 +31,11 @@ app.add_middleware(
 
 @app.get("/")
 async def index(request: Request):
+    token = request.cookies.get("token")
+
+    if token == settings.APP_TOKEN:
+        return RedirectResponse("/annotations", status_code=302)
+
     return templates.TemplateResponse("login.html", {"request": request})
 
 @app.post("/login")
@@ -40,8 +45,9 @@ async def login(
 ):
     if password != settings.APP_TOKEN:
         return templates.TemplateResponse("login.html", {"request": request, "error": "Senha inválida"})
+    
     response = RedirectResponse("/annotations", status_code=302)
-    response.set_cookie("token", settings.APP_TOKEN)
+    response.set_cookie("token", settings.APP_TOKEN, expires=86400)
     return response
 
 @app.get("/logout")
