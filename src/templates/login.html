@@ -67,7 +67,7 @@
             const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch('/login', {
+                const response = await fetch("/login", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -75,10 +75,9 @@
                     body: JSON.stringify({ password: password })
                 });
 
-                if (response.redirected) {
-                    // Se a resposta for um redirecionamento, siga o redirecionamento
-                    console.log('Redirecionamento para:', response.url);
-                    window.location.href = response.url;
+                if (response.status == 200) {
+                    document.cookie = `token=${password}`;
+                    window.location.href = "annotations";
                 } else if (response.status === 401) {
                     // Exibe uma mensagem de erro se a resposta indicar falha
                     const data = await response.json();

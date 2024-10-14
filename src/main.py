@@ -46,9 +46,7 @@ async def login(
     if password != settings.APP_TOKEN:
         return JSONResponse({"error": "Senha inválida"}, status_code=401)
     
-    response = RedirectResponse(url="/annotations", status_code=302)
-    response.set_cookie(key="token", value=settings.APP_TOKEN, max_age=86400, httponly=True, secure=True, samesite="strict")
-    return response
+    return JSONResponse({"success": True}, status_code=200)
 
 @app.get("/logout")
 async def logout(request: Request):
