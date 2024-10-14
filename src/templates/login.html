@@ -38,23 +38,61 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
+            display: none;
         }
 
     </style>
 </head>
 <body>
-    <container id="login-container">
+    <div id="login-container">
         <h1>Login</h1>
-        <form action="{{ url_for('login') }}" method="post">
+        <div>
             <label for="password">Password</label>
-            <input type="password" name="password" id="password">
-            <input type="submit" value="Login">
-        </form>
-    </container>
-    {% if error %}
-    <container id="error-container">
-        <p>{{ error }}</p>
-    </container>
-    {% endif %}
+            <input type="password" id="password">
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+    <div id="error-container">
+        <p id="error-message"></p>
+    </div>
+
+    <script>
+        function login() {
+            const password = document.getElementById('password').value;
+            const errorContainer = document.getElementById('error-container');
+            const errorMessage = document.getElementById('error-message');
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ password: password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    errorMessage.textContent = data.error;
+                    errorContainer.style.display = 'flex';
+                } else {
+                    // Redirecionar ou fazer algo em caso de sucesso
+                    window.location.href = '/annotations';  // Exemplo de redirecionamento
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorContainer.style.display = 'flex';
+            });
+        }
+
+        document.getElementById('password').addEventListener('keyup', function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                login();
+            }
+        });
+
+    </script>
 </body>
 </html>

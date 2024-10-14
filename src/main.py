@@ -5,8 +5,9 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
 sys.path.insert(0, project_root)
 
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Body
 from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.cors import CORSMiddleware
@@ -35,16 +36,13 @@ async def index(request: Request):
 @app.post("/login")
 async def login(
     request: Request,
-    password: str = Form(...),
+    password: str = Body(..., embed=True),
 ):
 
-    if password != settings.APP_TOKEN:
-        return templates.TemplateResponse("login.html", {"request": request, "error": "Senha inválida"})
-
-    response = RedirectResponse("/annotations", status_code=302)
-    response.set_cookie("token", settings.APP_TOKEN)
-
-    return response
+    if password == "senha_correta": 
+        return JSONResponse(content={"success": True}, status_code=200)
+    else:
+        raise HTTPException(status_code=401, detail="Senha incorreta")
 
 @app.get("/logout")
 async def logout(request: Request):
