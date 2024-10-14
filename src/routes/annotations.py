@@ -15,5 +15,5 @@ async def get_annotations(
     _ = Depends(verify_token)
 ):
     
-    result = repo.get_annotations()
+    result = repo.get_annotations()  # Obter as anotações
     return template.TemplateResponse("index.html", {"request": request, "annotations": result})
