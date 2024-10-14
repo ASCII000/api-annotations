@@ -67,6 +67,7 @@
             const password = document.getElementById('password').value;
 
             try {
+                console.log("bars")
                 const response = await fetch('/login', {
                     method: 'POST',
                     headers: {
@@ -74,7 +75,7 @@
                     },
                     body: JSON.stringify({ password: password })
                 });
-
+                console.log("foo")
                 if (response.redirected) {
                     // Se a resposta for um redirecionamento, siga o redirecionamento
                     console.log('Redirecionamento:', response.url);
