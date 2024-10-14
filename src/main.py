@@ -38,11 +38,11 @@ async def login(
     request: Request,
     password: str = Body(..., embed=True),
 ):
-
-    if password == "senha_correta": 
-        return JSONResponse(content={"success": True}, status_code=200)
-    else:
-        raise HTTPException(status_code=401, detail="Senha incorreta")
+    if password != settings.APP_TOKEN:
+        return templates.TemplateResponse("login.html", {"request": request, "error": "Senha inválida"})
+    response = RedirectResponse("/annotations", status_code=302)
+    response.set_cookie("token", settings.APP_TOKEN)
+    return response
 
 @app.get("/logout")
 async def logout(request: Request):

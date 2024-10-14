@@ -6,7 +6,6 @@
     <title>Login</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
-
         body {
             font-family: 'Inter', sans-serif;
             display: flex;
@@ -14,15 +13,16 @@
             align-items: center;
             height: 100vh;
             background-color: #f2f2f2;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
         }
-
+        
         #login-container {
             background-color: #fff;
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
         #error-container {
             position: absolute;
             top: 0;
@@ -38,61 +38,56 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
-            display: none;
         }
-
     </style>
 </head>
 <body>
     <div id="login-container">
         <h1>Login</h1>
-        <div>
+        <form id="login-form">
             <label for="password">Password</label>
-            <input type="password" id="password">
-            <button onclick="login()">Login</button>
-        </div>
+            <input type="password" name="password" id="password">
+            <input type="submit" value="Login">
+        </form>
     </div>
-    <div id="error-container">
+
+    <div id="error-container" style="display:none;">
         <p id="error-message"></p>
     </div>
 
     <script>
-        function login() {
-            const password = document.getElementById('password').value;
-            const errorContainer = document.getElementById('error-container');
-            const errorMessage = document.getElementById('error-message');
 
-            fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ password: password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    errorMessage.textContent = data.error;
-                    errorContainer.style.display = 'flex';
-                } else {
-                    // Redirecionar ou fazer algo em caso de sucesso
-                    window.location.href = '/annotations';  // Exemplo de redirecionamento
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                errorMessage.textContent = 'An error occurred. Please try again.';
-                errorContainer.style.display = 'flex';
-            });
-        }
-
-        document.getElementById('password').addEventListener('keyup', function(event) {
-            if (event.keyCode === 13) {
-                event.preventDefault();
-                login();
-            }
+        document.addEventListener("DOMContentLoaded", function() {
+            document.body.style.opacity = 1;
         });
 
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Previne o envio padrão do formulário
+
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('{{ url_for('login') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password: password })
+                });
+
+                if (response.redirected) {
+                    // Se a resposta for um redirecionamento, siga o redirecionamento
+                    window.location.href = response.url;
+                } else if (response.status === 401) {
+                    // Exibe uma mensagem de erro se a resposta indicar falha
+                    const errorMessage = await response.text();
+                    document.getElementById('error-container').style.display = 'flex';
+                    document.getElementById('error-message').textContent = errorMessage;
+                }
+            } catch (error) {
+                console.error('Erro durante o login:', error);
+            }
+        });
     </script>
 </body>
 </html>
