@@ -1,4 +1,4 @@
-MEMORY=248
+MEMORY=128
 VERSION=recommended
 DISPLAY_NAME=Meu site nextjs simples!
 SUBDOMAIN=meusite-site-nextjs
